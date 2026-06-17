@@ -9,18 +9,32 @@ class TiketVelvet extends Tiket {
 
     public function __construct($id, $film, $jadwal, $jumlah, $harga, $pack, $butler) {
         parent::__construct($id, $film, $jadwal, $jumlah, $harga);
-        $this->bantalSelimutPack = $pack; // Boolean
-        $this->layananButler = $butler;   // Boolean
+        $this->bantalSelimutPack = $pack;
+        $this->layananButler = $butler;
     }
 
+    public static function selectById($conn, $id) {
+        $stmt = $conn->prepare("SELECT * FROM tabel_tiket WHERE id_tiket = ? AND jenis_studio = 'IMAX'");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        if ($res) {
+            return new self($res['id_tiket'], $res['nama_film'], $res['jadwal_tayang'], 
+                            $res['jumlah_kursi'], $res['harga_dasar_tiket'], 
+                            $res['kacamata_3d_id'], $res['efek_gerak_fitur']);
+        }
+        return null;
+    }
+
+    // Override: Surcharge 50% (x 1.50)
     public function hitungTotalHarga() {
-        // Velvet ada biaya tambahan flat untuk pelayanan
-        return ($this->jumlah_kursi * $this->hargaDasarTiket) + 50000;
+        return ($this->jumlah_kursi * $this->hargaDasarTiket) * 1.50;
     }
 
     public function tampilkanInfoFasilitas() {
-        $butler = $this->layananButler ? "Tersedia" : "Tidak Tersedia";
-        return "Fasilitas Velvet: Bantal & Selimut (" . ($this->bantalSelimutPack ? "Ya" : "Tidak") . "), Butler: $butler.";
+        $statusButler = $this->layananButler ? "Aktif" : "Tidak Aktif";
+        $statusPack = $this->bantalSelimutPack ? "Disediakan" : "Tidak Disediakan";
+        return "Fasilitas Velvet: Bantal & Selimut ($statusPack), Butler: $statusButler.";
     }
 }
 

@@ -13,6 +13,20 @@ class TiketReguler extends Tiket {
         $this->lokasiBaris = $baris;
     }
 
+    public static function selectById($conn, $id) {
+        $stmt = $conn->prepare("SELECT * FROM tabel_tiket WHERE id_tiket = ? AND jenis_studio = 'Reguler'");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        if ($res) {
+            return new self($res['id_tiket'], $res['nama_film'], $res['jadwal_tayang'], 
+                            $res['jumlah_kursi'], $res['harga_dasar_tiket'], 
+                            $res['tipe_audio'], $res['lokasi_baris']);
+        }
+        return null;
+    }
+
+    // Override: Tarif standar murni
     public function hitungTotalHarga() {
         return $this->jumlah_kursi * $this->hargaDasarTiket;
     }
@@ -21,5 +35,4 @@ class TiketReguler extends Tiket {
         return "Fasilitas Reguler: Audio {$this->tipeAudio}, Baris {$this->lokasiBaris}.";
     }
 }
-
 ?>
