@@ -19,9 +19,9 @@ class Database {
 
         // Cek koneksi
         if ($this->conn->connect_error) {
-            die("Koneksi gagal: " . $this->conn->connect_error);
+            die("" . $this->conn->connect_error);
         } else {
-            echo "<h1>Koneksi Sukses Anda Berhasil Terhubung Ke Database</h1>";
+            echo "";
         }
     }
 
